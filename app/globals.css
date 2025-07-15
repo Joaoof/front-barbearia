@@ -10,6 +10,15 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @layer base {
@@ -90,10 +99,18 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
   }
 }
 
 /* Transições simples */
 * {
   transition: all 0.2s ease;
+}
+
+/* Prevenir scroll horizontal */
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
 }

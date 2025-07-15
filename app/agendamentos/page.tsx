@@ -5,19 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, Clock, ChevronDown, Star } from "lucide-react"
+import { Calendar, Clock, ChevronDown, Star, X } from "lucide-react"
 import { BottomNavigation } from "@/components/mobile/bottom-navigation"
 import { DesktopSidebar } from "@/components/desktop/desktop-sidebar"
-
-interface Appointment {
-  id: string
-  barberName: string
-  barberAvatar: string
-  date: string
-  time: string
-  status: "scheduled" | "completed" | "cancelled"
-  rating?: number
-}
+import { useApp } from "@/contexts/app-context"
 
 export default function AgendamentosPage() {
   const [isMobile, setIsMobile] = useState(false)
@@ -25,39 +16,7 @@ export default function AgendamentosPage() {
   const [selectedStatus, setSelectedStatus] = useState("Situação")
   const [selectedBarber, setSelectedBarber] = useState("Barbeiro")
 
-  // Mock user data
-  const userName = "João"
-  const userAvatar = "/images/jardel-profile.jpg"
-
-  // Mock data - dados mockados como solicitado
-  const mockAppointments: Appointment[] = [
-    {
-      id: "1",
-      barberName: "Jardel",
-      barberAvatar: "/images/jardel-profile.jpg",
-      date: "Terça, 24 de Maio",
-      time: "10:00",
-      status: "scheduled",
-    },
-    {
-      id: "2",
-      barberName: "Jardel",
-      barberAvatar: "/images/jardel-profile.jpg",
-      date: "Terça, 29 de Abril",
-      time: "10:00",
-      status: "completed",
-      rating: 5.0,
-    },
-    {
-      id: "3",
-      barberName: "Jardel",
-      barberAvatar: "/images/jardel-profile.jpg",
-      date: "Segunda, 14 de Abril",
-      time: "10:00",
-      status: "completed",
-      rating: 5.0,
-    },
-  ]
+  const { appointments, cancelAppointment, userName } = useApp()
 
   useEffect(() => {
     const checkMobile = () => {
@@ -71,16 +30,17 @@ export default function AgendamentosPage() {
   }, [])
 
   // Agrupar agendamentos por mês
-  const groupedAppointments = mockAppointments.reduce(
+  const groupedAppointments = appointments.reduce(
     (groups, appointment) => {
-      const month = appointment.date.includes("Maio") ? "Maio" : "Abril"
+      const date = new Date(appointment.date)
+      const month = date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
       if (!groups[month]) {
         groups[month] = []
       }
       groups[month].push(appointment)
       return groups
     },
-    {} as Record<string, Appointment[]>,
+    {} as Record<string, typeof appointments>,
   )
 
   const getStatusColor = (status: string) => {
@@ -109,21 +69,45 @@ export default function AgendamentosPage() {
     }
   }
 
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString("pt-BR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    })
+  }
+
+  const handleCancelAppointment = (appointmentId: string) => {
+    if (confirm("Tem certeza que deseja cancelar este agendamento?")) {
+      cancelAppointment(appointmentId)
+    }
+  }
+
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white w-full">
+      <div className="min-h-screen bg-gray-900 text-white w-full overflow-x-hidden">
         {/* Header com filtros */}
         <div className="p-4 space-y-4 w-full">
-          <div className="flex gap-2 w-full">
-            <Button variant="outline" className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
+          <div className="flex gap-2 w-full overflow-x-auto">
+            <Button
+              variant="outline"
+              className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700 flex-shrink-0"
+            >
               {selectedPeriod}
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
-            <Button variant="outline" className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
+            <Button
+              variant="outline"
+              className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700 flex-shrink-0"
+            >
               {selectedStatus}
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
-            <Button variant="outline" className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
+            <Button
+              variant="outline"
+              className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700 flex-shrink-0"
+            >
               {selectedBarber}
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
@@ -132,36 +116,54 @@ export default function AgendamentosPage() {
 
         {/* Lista de agendamentos agrupados por mês */}
         <div className="px-4 pb-20 w-full">
-          {Object.entries(groupedAppointments).map(([month, appointments]) => (
+          {Object.entries(groupedAppointments).map(([month, monthAppointments]) => (
             <div key={month} className="mb-6 w-full">
-              <h2 className="text-white font-medium mb-3">{month}</h2>
+              <h2 className="text-white font-medium mb-3 capitalize">{month}</h2>
               <div className="space-y-3 w-full">
-                {appointments.map((appointment) => (
+                {monthAppointments.map((appointment) => (
                   <Card key={appointment.id} className="bg-gray-800 border-gray-700 w-full">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-12 h-12">
-                          <AvatarImage src={appointment.barberAvatar || "/placeholder.svg"} />
-                          <AvatarFallback>{appointment.barberName.charAt(0)}</AvatarFallback>
+                          <AvatarImage src="/images/jardel-profile.jpg" alt={appointment.barber.name} />
+                          <AvatarFallback className="bg-blue-600 text-white font-semibold">
+                            {appointment.barber.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <h3 className="text-white font-medium">{appointment.barberName}</h3>
-                            {appointment.rating && (
-                              <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                                <span className="text-white text-sm">{appointment.rating}</span>
-                              </div>
-                            )}
+                            <h3 className="text-white font-medium">{appointment.barber.name}</h3>
+                            <div className="flex items-center gap-2">
+                              {appointment.rating && (
+                                <div className="flex items-center gap-1">
+                                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                                  <span className="text-white text-sm">{appointment.rating}</span>
+                                </div>
+                              )}
+                              {appointment.status === "scheduled" && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="w-6 h-6 text-red-400 hover:text-red-300"
+                                  onClick={() => handleCancelAppointment(appointment.id)}
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
                           </div>
+                          <p className="text-gray-400 text-sm mb-1">{appointment.service.name}</p>
                           <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
                             <Calendar className="w-4 h-4" />
-                            <span>{appointment.date}</span>
+                            <span>{formatDate(appointment.date)}</span>
                           </div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 text-gray-400 text-sm">
                               <Clock className="w-4 h-4" />
                               <span>{appointment.time}</span>
+                              <span className="text-green-400 font-medium">
+                                R$ {appointment.service.price.toFixed(2)}
+                              </span>
                             </div>
                             <Badge className={getStatusColor(appointment.status)}>
                               {getStatusText(appointment.status)}
@@ -175,6 +177,13 @@ export default function AgendamentosPage() {
               </div>
             </div>
           ))}
+
+          {appointments.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-400">Nenhum agendamento encontrado</p>
+              <p className="text-gray-500 text-sm mt-1">Faça seu primeiro agendamento!</p>
+            </div>
+          )}
         </div>
 
         <BottomNavigation />
@@ -182,21 +191,17 @@ export default function AgendamentosPage() {
     )
   }
 
-  // Desktop: Página completa com sidebar
+  // Desktop: Página completa com sidebar fixa
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
-      {/* Sidebar à esquerda */}
-      <DesktopSidebar userName={userName} userAvatar={userAvatar} />
+    <div className="min-h-screen bg-gray-900 text-white">
+      <DesktopSidebar userName={userName} />
 
-      {/* Conteúdo principal */}
-      <div className="flex-1 bg-gray-900">
-        {/* Header da página */}
+      <div className="ml-64 min-h-screen bg-gray-900">
         <div className="p-6 border-b border-gray-700">
           <h1 className="text-2xl font-bold text-white">Agendamentos</h1>
           <p className="text-gray-400 text-sm mt-1">Gerencie seus agendamentos</p>
         </div>
 
-        {/* Filtros */}
         <div className="p-6 border-b border-gray-700">
           <div className="flex gap-4">
             <Button variant="outline" className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
@@ -214,47 +219,58 @@ export default function AgendamentosPage() {
           </div>
         </div>
 
-        {/* Conteúdo dos agendamentos como notificações */}
         <div className="p-6">
           <div className="space-y-4 max-w-2xl">
-            {Object.entries(groupedAppointments).map(([month, appointments]) => (
+            {Object.entries(groupedAppointments).map(([month, monthAppointments]) => (
               <div key={month} className="bg-gray-800 border border-gray-600 rounded-lg p-4 flex items-start gap-4">
-                {/* Ícone de data */}
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
                     <Calendar className="w-6 h-6 text-white" />
                   </div>
                 </div>
 
-                {/* Conteúdo da notificação */}
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-white font-semibold text-lg">{month}</h3>
+                    <h3 className="text-white font-semibold text-lg capitalize">{month}</h3>
                     <Badge className="bg-gray-700 text-gray-300 hover:bg-gray-700">
-                      {appointments.length} agendamento{appointments.length > 1 ? "s" : ""}
+                      {monthAppointments.length} agendamento{monthAppointments.length > 1 ? "s" : ""}
                     </Badge>
                   </div>
 
-                  {/* Lista compacta dos agendamentos */}
                   <div className="space-y-2">
-                    {appointments.map((appointment) => (
+                    {monthAppointments.map((appointment) => (
                       <div key={appointment.id} className="flex items-center gap-3 p-2 bg-gray-700 rounded">
                         <Avatar className="w-8 h-8">
-                          <AvatarImage src={appointment.barberAvatar || "/placeholder.svg"} />
-                          <AvatarFallback className="text-xs">{appointment.barberName.charAt(0)}</AvatarFallback>
+                          <AvatarImage src="/images/jardel-profile.jpg" alt={appointment.barber.name} />
+                          <AvatarFallback className="text-xs bg-blue-600 text-white font-semibold">
+                            {appointment.barber.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
-                            <span className="text-white text-sm font-medium">{appointment.barberName}</span>
+                            <span className="text-white text-sm font-medium">{appointment.barber.name}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-gray-400 text-xs">{appointment.time}</span>
                               <Badge className={`${getStatusColor(appointment.status)} text-xs px-2 py-1`}>
                                 {getStatusText(appointment.status)}
                               </Badge>
+                              {appointment.status === "scheduled" && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="w-5 h-5 text-red-400 hover:text-red-300 p-0"
+                                  onClick={() => handleCancelAppointment(appointment.id)}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-gray-400 text-xs">{appointment.date}</span>
+                            <span className="text-gray-400 text-xs">{appointment.service.name}</span>
+                            <span className="text-green-400 text-xs font-medium">
+                              R$ {appointment.service.price.toFixed(2)}
+                            </span>
                             {appointment.rating && (
                               <div className="flex items-center gap-1">
                                 <Star className="w-3 h-3 text-yellow-500 fill-current" />
@@ -269,6 +285,13 @@ export default function AgendamentosPage() {
                 </div>
               </div>
             ))}
+
+            {appointments.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-400">Nenhum agendamento encontrado</p>
+                <p className="text-gray-500 text-sm mt-1">Faça seu primeiro agendamento!</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

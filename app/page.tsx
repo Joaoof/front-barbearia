@@ -1,10 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useAppointments } from "@/hooks/useAppointments"
-import { useServices } from "@/hooks/useServices"
-import { useOffers } from "@/hooks/useOffers"
-import { apiService, type Schedule } from "@/lib/api"
+import { useApp } from "@/contexts/app-context"
 import { Settings } from "lucide-react"
 
 // Components
@@ -19,17 +16,28 @@ import { Button } from "@/components/ui/button"
 
 export default function BarbershopApp() {
   const [isMobile, setIsMobile] = useState(false)
-  const [schedule, setSchedule] = useState<Schedule | null>(null)
   const [showNotification, setShowNotification] = useState(false)
 
-  // Mock user data - replace with real authentication
-  const userId = "user-123"
-  const userName = "João"
-  const userAvatar = "/images/jardel-profile.jpg"
+  const { appointments, services, userName } = useApp()
 
-  const { nextAppointment, loading: appointmentsLoading } = useAppointments(userId)
-  const { services, loading: servicesLoading } = useServices()
-  const { offers, loading: offersLoading } = useOffers()
+  // Mock schedule data
+  const schedule = {
+    weekdays: { open: "8h", close: "19h" },
+    saturday: { open: "8h", close: "17h" },
+    isOpen: true,
+  }
+
+  // Mock offers data
+  const offers = [
+    {
+      id: "1",
+      title: "Corte + Barba",
+      description: "Pacote completo com desconto especial",
+      discount: 20,
+      image: "/images/barber-offer.jpg",
+      validUntil: "2024-12-31",
+    },
+  ]
 
   useEffect(() => {
     const checkMobile = () => {
@@ -42,60 +50,46 @@ export default function BarbershopApp() {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
-  useEffect(() => {
-    async function fetchSchedule() {
-      try {
-        const scheduleData = await apiService.getSchedule()
-        setSchedule(scheduleData)
-      } catch (error) {
-        // Fallback schedule
-        setSchedule({
-          weekdays: { open: "8h", close: "19h" },
-          saturday: { open: "8h", close: "17h" },
-          isOpen: true,
-        })
-      }
-    }
-
-    fetchSchedule()
-  }, [])
-
   const currentDate = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
     day: "numeric",
     month: "long",
   })
 
+  // Get next appointment
+  const nextAppointment = appointments
+    .filter((apt) => apt.status === "scheduled")
+    .sort((a, b) => new Date(a.date + " " + a.time).getTime() - new Date(b.date + " " + b.time).getTime())[0]
+
   if (isMobile) {
-    // Mobile: Layout original ocupando 100% da tela
+    // Mobile: Layout original ocupando 100% da tela sem bordas
     return (
-      <div className="min-h-screen bg-gray-900 text-white w-full">
-        <MobileHeader userName={userName} userAvatar={userAvatar} currentDate={currentDate} />
+      <div className="min-h-screen bg-gray-900 text-white w-full overflow-x-hidden">
+        <MobileHeader userName={userName} currentDate={currentDate} />
 
-        {schedule && <ScheduleSection schedule={schedule} />}
+        <ScheduleSection schedule={schedule} />
 
-        <NextAppointment appointment={nextAppointment} loading={appointmentsLoading} />
+        <NextAppointment appointment={nextAppointment} />
 
-        <OffersSection offers={offers} loading={offersLoading} />
+        <OffersSection offers={offers} />
 
-        <ServicesSection services={services} loading={servicesLoading} />
+        <ServicesSection services={services} />
 
         <BottomNavigation />
       </div>
     )
   }
 
-  // Desktop: Sidebar + conteúdo expandido em colunas
+  // Desktop: Sidebar fixa + conteúdo com margem
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
-      {/* Sidebar à esquerda */}
-      <DesktopSidebar userName={userName} userAvatar={userAvatar} />
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Sidebar fixa */}
+      <DesktopSidebar userName={userName} />
 
-      {/* Conteúdo principal expandido */}
-      <div className="flex-1 flex">
-        {/* Coluna principal - conteúdo igual ao mobile */}
-        <div className="flex-1 bg-gray-900">
-          <MobileHeader userName={userName} userAvatar={userAvatar} currentDate={currentDate} showStatusBar={false} />
+      {/* Conteúdo principal com margem para a sidebar */}
+      <div className="ml-64 min-h-screen">
+        <div className="bg-gray-900">
+          <MobileHeader userName={userName} currentDate={currentDate} showStatusBar={false} />
 
           {/* Settings toggle for expanded view */}
           <div className="px-4 pb-4 border-b border-gray-700">
@@ -104,7 +98,7 @@ export default function BarbershopApp() {
               size="sm"
               onClick={() => {
                 setShowNotification(true)
-                setTimeout(() => setShowNotification(false), 5000) // Auto-hide após 5 segundos
+                setTimeout(() => setShowNotification(false), 5000)
               }}
               className="text-gray-400 hover:text-white"
             >
@@ -129,22 +123,23 @@ export default function BarbershopApp() {
               </div>
 
               <div className="p-4 space-y-3">
-                {/* Estatísticas em formato de notificação */}
                 <div className="bg-gray-700 rounded p-3">
                   <p className="text-xs text-gray-400 mb-1">Resumo do Mês</p>
                   <div className="flex justify-between text-sm">
-                    <span className="text-white">12 agendamentos</span>
-                    <span className="text-green-400 font-semibold">R$ 480,00</span>
+                    <span className="text-white">{appointments.length} agendamentos</span>
+                    <span className="text-green-400 font-semibold">
+                      R$ {appointments.reduce((sum, apt) => sum + apt.service.price, 0).toFixed(2)}
+                    </span>
                   </div>
                 </div>
 
-                {/* Próximos agendamentos */}
                 <div className="bg-gray-700 rounded p-3">
                   <p className="text-xs text-gray-400 mb-1">Próximos Agendamentos</p>
-                  <p className="text-sm text-blue-400 font-semibold">3 agendamentos marcados</p>
+                  <p className="text-sm text-blue-400 font-semibold">
+                    {appointments.filter((apt) => apt.status === "scheduled").length} agendamentos marcados
+                  </p>
                 </div>
 
-                {/* Barbeiro favorito */}
                 <div className="bg-gray-700 rounded p-3">
                   <p className="text-xs text-gray-400 mb-1">Barbeiro Favorito</p>
                   <p className="text-sm text-white font-semibold">👨‍💼 Jardel</p>
@@ -153,12 +148,11 @@ export default function BarbershopApp() {
             </div>
           )}
 
-          {schedule && <ScheduleSection schedule={schedule} />}
-          <NextAppointment appointment={nextAppointment} loading={appointmentsLoading} />
-          <OffersSection offers={offers} loading={offersLoading} />
-          <ServicesSection services={services} loading={servicesLoading} />
+          <ScheduleSection schedule={schedule} />
+          <NextAppointment appointment={nextAppointment} />
+          <OffersSection offers={offers} />
+          <ServicesSection services={services} />
 
-          {/* Espaço para bottom navigation no desktop */}
           <div className="h-20"></div>
         </div>
       </div>

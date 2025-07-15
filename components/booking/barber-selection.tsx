@@ -4,25 +4,22 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ChevronLeft, Heart, Star } from "lucide-react"
+import { useApp } from "@/contexts/app-context"
+import { BookingFlow } from "./booking-flow"
 import Image from "next/image"
-
-interface Barber {
-  id: string
-  name: string
-  avatar: string
-  rating: number
-  specialties: string[]
-}
 
 interface BarberSelectionProps {
   isOpen: boolean
   onClose: () => void
-  onSelectBarber: (barber: Barber) => void
+  onSelectBarber?: (barber: any) => void
 }
 
 export function BarberSelection({ isOpen, onClose, onSelectBarber }: BarberSelectionProps) {
+  const { barbers } = useApp()
   const [favorites, setFavorites] = useState<string[]>([])
   const [isMobile, setIsMobile] = useState(false)
+  const [showBookingFlow, setShowBookingFlow] = useState(false)
+  const [selectedBarber, setSelectedBarber] = useState<any>(null)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -33,41 +30,40 @@ export function BarberSelection({ isOpen, onClose, onSelectBarber }: BarberSelec
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
-  const barbers: Barber[] = [
-    {
-      id: "1",
-      name: "Jardel",
-      avatar: "/images/barber-jardel.jpg",
-      rating: 5.0,
-      specialties: ["Corte", "Barba", "Bigode"],
-    },
-    {
-      id: "2",
-      name: "Carlos",
-      avatar: "/images/jardel-profile.jpg",
-      rating: 4.8,
-      specialties: ["Corte", "Barba"],
-    },
-    {
-      id: "3",
-      name: "Roberto",
-      avatar: "/images/jardel-profile.jpg",
-      rating: 4.9,
-      specialties: ["Corte", "Degradê"],
-    },
-  ]
-
   const toggleFavorite = (barberId: string) => {
     setFavorites((prev) => (prev.includes(barberId) ? prev.filter((id) => id !== barberId) : [...prev, barberId]))
   }
 
-  if (!isOpen) return null
+  const handleSelectBarber = (barber: any) => {
+    setSelectedBarber(barber)
+    setShowBookingFlow(true)
+    // NÃO chamar onClose() aqui para não voltar à tela inicial
+    if (onSelectBarber) {
+      onSelectBarber(barber)
+    }
+  }
+
+  if (!isOpen && !showBookingFlow) return null
+
+  if (showBookingFlow) {
+    return (
+      <BookingFlow
+        isOpen={showBookingFlow}
+        onClose={() => {
+          setShowBookingFlow(false)
+          setSelectedBarber(null)
+          onClose() // Só fechar quando terminar o fluxo completo
+        }}
+        selectedBarber={selectedBarber}
+      />
+    )
+  }
 
   if (isMobile) {
     return (
-      <div className="fixed inset-0 bg-gray-900 z-50">
+      <div className="fixed inset-0 bg-gray-900 z-50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-4 p-4">
+        <div className="flex items-center gap-4 p-4 bg-gray-900">
           <Button variant="ghost" size="icon" onClick={onClose} className="text-white">
             <ChevronLeft className="w-5 h-5" />
           </Button>
@@ -78,27 +74,27 @@ export function BarberSelection({ isOpen, onClose, onSelectBarber }: BarberSelec
           <p className="text-gray-400 text-sm">Escolha um barbeiro de sua preferência.</p>
         </div>
 
-        {/* Carrossel de barbeiros */}
-        <div className="px-4">
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+        {/* Carrossel de barbeiros - sem scroll horizontal */}
+        <div className="px-4 h-full overflow-hidden">
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide h-full">
             {barbers.map((barber, index) => (
               <div
                 key={barber.id}
-                className="flex-shrink-0 w-72 snap-center animate-in slide-in-from-right duration-500"
+                className="flex-shrink-0 w-full max-w-xs snap-center animate-in slide-in-from-right duration-500"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
                 <Card
-                  className="bg-gray-800 border-gray-700 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300"
-                  onClick={() => onSelectBarber(barber)}
+                  className="bg-gray-800 border-gray-700 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 h-96"
+                  onClick={() => handleSelectBarber(barber)}
                 >
-                  <CardContent className="p-0 relative">
-                    <div className="relative h-80 w-full">
+                  <CardContent className="p-0 relative h-full">
+                    <div className="relative h-full w-full">
                       <Image
                         src={barber.avatar || "/placeholder.svg"}
                         alt={barber.name}
                         fill
                         className="object-cover"
-                        sizes="288px"
+                        sizes="320px"
                         priority={index === 0}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
@@ -119,9 +115,16 @@ export function BarberSelection({ isOpen, onClose, onSelectBarber }: BarberSelec
 
                       <div className="absolute bottom-4 left-4 right-4">
                         <h3 className="text-white text-xl font-bold mb-1">{barber.name}</h3>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 mb-2">
                           <Star className="w-4 h-4 text-yellow-500 fill-current" />
                           <span className="text-yellow-500 text-sm font-medium">{barber.rating}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {barber.specialties.slice(0, 2).map((specialty) => (
+                            <span key={specialty} className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                              {specialty}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -154,7 +157,7 @@ export function BarberSelection({ isOpen, onClose, onSelectBarber }: BarberSelec
             <Card
               key={barber.id}
               className="bg-gray-700 border-gray-600 overflow-hidden cursor-pointer hover:bg-gray-650"
-              onClick={() => onSelectBarber(barber)}
+              onClick={() => handleSelectBarber(barber)}
             >
               <CardContent className="p-0 relative">
                 <div className="relative h-48 w-full">

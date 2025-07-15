@@ -26,7 +26,7 @@ export function DesktopSidebar({ userName, userAvatar }: DesktopSidebarProps) {
   ]
 
   return (
-    <aside className="w-64 bg-gray-800 text-white h-screen flex flex-col">
+    <aside className="w-64 bg-gray-800 text-white min-h-screen flex flex-col fixed left-0 top-0 bottom-0">
       {/* Logo/Brand */}
       <div className="p-6 border-b border-gray-700">
         <h1 className="text-xl font-bold">BarberShop</h1>
@@ -37,8 +37,10 @@ export function DesktopSidebar({ userName, userAvatar }: DesktopSidebarProps) {
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10">
-            <AvatarImage src={userAvatar || "/placeholder.svg"} />
-            <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+            <AvatarImage src="/images/jardel-profile.jpg" alt={userName} />
+            <AvatarFallback className="bg-blue-600 text-white font-semibold">
+              {userName.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <div>
             <p className="font-medium">{userName}</p>

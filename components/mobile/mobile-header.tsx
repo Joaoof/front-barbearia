@@ -10,16 +10,18 @@ interface MobileHeaderProps {
 export function MobileHeader({ userName, userAvatar, currentDate, showStatusBar = true }: MobileHeaderProps) {
   return (
     <>
-      {/* Header */}
-      <div className="py-4">
+      {/* Header com espaçamento ajustado */}
+      <div className="pt-6 pb-4">
         <div className="flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10">
-              <AvatarImage src={userAvatar || "/placeholder.svg"} />
-              <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+            <Avatar className="w-12 h-12">
+              <AvatarImage src="/images/jardel-profile.jpg" alt={userName} />
+              <AvatarFallback className="bg-blue-600 text-white font-semibold">
+                {userName.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-lg font-semibold">Olá, {userName} 👋</h1>
+              <h1 className="text-lg font-semibold text-white">Olá, {userName} 👋</h1>
               <p className="text-gray-400 text-sm">{currentDate}</p>
             </div>
           </div>
