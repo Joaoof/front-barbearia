@@ -43,7 +43,7 @@ export function LoginForm({ onToggleMode, onContinueAsGuest }: LoginFormProps) {
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Faça seu login</h1>
+        <h1 className="text-2xl md:text-3xl font-serif text-gray-900 mb-2">Faça seu login</h1>
         <p className="text-gray-600">Acesse sua conta para ver seus agendamentos</p>
       </div>
 
