@@ -1,13 +1,24 @@
+"use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { LogOut, User } from "lucide-react"
+import { useAuth } from "@/contexts/auth-context"
 
 interface MobileHeaderProps {
-  userName: string
-  userAvatar?: string
   currentDate: string
   showStatusBar?: boolean
 }
 
-export function MobileHeader({ userName, userAvatar, currentDate, showStatusBar = true }: MobileHeaderProps) {
+export function MobileHeader({ currentDate, showStatusBar = true }: MobileHeaderProps) {
+  const { user, logout, isGuest } = useAuth()
+
+  const handleLogout = async () => {
+    if (confirm("Deseja sair da sua conta?")) {
+      await logout()
+    }
+  }
+
   return (
     <>
       {/* Header com espaçamento ajustado */}
@@ -15,19 +26,22 @@ export function MobileHeader({ userName, userAvatar, currentDate, showStatusBar 
         <div className="flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <Avatar className="w-12 h-12">
-              <AvatarImage src="/images/jardel-profile.jpg" alt={userName} />
+              <AvatarImage src={user?.avatar || "/images/jardel-profile.jpg"} alt={user?.name} />
               <AvatarFallback className="bg-blue-600 text-white font-semibold">
-                {userName.charAt(0).toUpperCase()}
+                {isGuest ? <User className="w-6 h-6" /> : user?.name?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-lg font-semibold text-white">Olá, {userName} 👋</h1>
+              <h1 className="text-lg font-semibold text-white">Olá, {isGuest ? "Visitante" : user?.name} 👋</h1>
               <p className="text-gray-400 text-sm">{currentDate}</p>
             </div>
           </div>
-          <div className="w-6 h-6 rounded-full border border-gray-600 flex items-center justify-center">
-            <div className="w-2 h-2 bg-white rounded-full"></div>
-          </div>
+
+          {!isGuest && (
+            <Button variant="ghost" size="icon" onClick={handleLogout} className="text-gray-400 hover:text-white">
+              <LogOut className="w-5 h-5" />
+            </Button>
+          )}
         </div>
       </div>
     </>

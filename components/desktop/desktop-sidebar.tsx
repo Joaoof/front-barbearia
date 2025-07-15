@@ -2,17 +2,20 @@
 
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Home, Calendar, Scissors, Heart, User, CreditCard, Clock, Settings, Bell } from "lucide-react"
+import { Home, Calendar, Scissors, Heart, User, CreditCard, Clock, Settings, Bell, LogOut } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 
-interface DesktopSidebarProps {
-  userName: string
-  userAvatar?: string
-}
-
-export function DesktopSidebar({ userName, userAvatar }: DesktopSidebarProps) {
+export function DesktopSidebar() {
   const router = useRouter()
   const pathname = usePathname()
+  const { user, logout, isGuest } = useAuth()
+
+  const handleLogout = async () => {
+    if (confirm("Deseja sair da sua conta?")) {
+      await logout()
+    }
+  }
 
   const menuItems = [
     { icon: Home, label: "Dashboard", path: "/" },
@@ -37,15 +40,25 @@ export function DesktopSidebar({ userName, userAvatar }: DesktopSidebarProps) {
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10">
-            <AvatarImage src="/images/jardel-profile.jpg" alt={userName} />
+            <AvatarImage src={user?.avatar || "/images/jardel-profile.jpg"} alt={user?.name} />
             <AvatarFallback className="bg-blue-600 text-white font-semibold">
-              {userName.charAt(0).toUpperCase()}
+              {isGuest ? <User className="w-5 h-5" /> : user?.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <p className="font-medium">{userName}</p>
-            <p className="text-gray-400 text-sm">Cliente Premium</p>
+          <div className="flex-1">
+            <p className="font-medium">{isGuest ? "Visitante" : user?.name}</p>
+            <p className="text-gray-400 text-sm">{isGuest ? "Modo visitante" : "Cliente Premium"}</p>
           </div>
+          {!isGuest && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              className="text-gray-400 hover:text-white w-8 h-8"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
 

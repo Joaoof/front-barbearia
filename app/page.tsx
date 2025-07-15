@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useApp } from "@/contexts/app-context"
+import { useAuth } from "@/contexts/auth-context"
 import { Settings } from "lucide-react"
 
 // Components
@@ -18,7 +19,8 @@ export default function BarbershopApp() {
   const [isMobile, setIsMobile] = useState(false)
   const [showNotification, setShowNotification] = useState(false)
 
-  const { appointments, services, userName } = useApp()
+  const { appointments, services } = useApp()
+  const { isGuest } = useAuth()
 
   // Mock schedule data
   const schedule = {
@@ -56,16 +58,18 @@ export default function BarbershopApp() {
     month: "long",
   })
 
-  // Get next appointment
-  const nextAppointment = appointments
-    .filter((apt) => apt.status === "scheduled")
-    .sort((a, b) => new Date(a.date + " " + a.time).getTime() - new Date(b.date + " " + b.time).getTime())[0]
+  // Get next appointment only if user is authenticated
+  const nextAppointment = !isGuest
+    ? appointments
+        .filter((apt) => apt.status === "scheduled")
+        .sort((a, b) => new Date(a.date + " " + a.time).getTime() - new Date(b.date + " " + b.time).getTime())[0]
+    : undefined
 
   if (isMobile) {
     // Mobile: Layout original ocupando 100% da tela sem bordas
     return (
       <div className="min-h-screen bg-gray-900 text-white w-full overflow-x-hidden">
-        <MobileHeader userName={userName} currentDate={currentDate} />
+        <MobileHeader currentDate={currentDate} />
 
         <ScheduleSection schedule={schedule} />
 
@@ -84,12 +88,12 @@ export default function BarbershopApp() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Sidebar fixa */}
-      <DesktopSidebar userName={userName} />
+      <DesktopSidebar />
 
       {/* Conteúdo principal com margem para a sidebar */}
       <div className="ml-64 min-h-screen">
         <div className="bg-gray-900">
-          <MobileHeader userName={userName} currentDate={currentDate} showStatusBar={false} />
+          <MobileHeader currentDate={currentDate} showStatusBar={false} />
 
           {/* Settings toggle for expanded view */}
           <div className="px-4 pb-4 border-b border-gray-700">
@@ -123,27 +127,35 @@ export default function BarbershopApp() {
               </div>
 
               <div className="p-4 space-y-3">
-                <div className="bg-gray-700 rounded p-3">
-                  <p className="text-xs text-gray-400 mb-1">Resumo do Mês</p>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white">{appointments.length} agendamentos</span>
-                    <span className="text-green-400 font-semibold">
-                      R$ {appointments.reduce((sum, apt) => sum + apt.service.price, 0).toFixed(2)}
-                    </span>
+                {!isGuest ? (
+                  <>
+                    <div className="bg-gray-700 rounded p-3">
+                      <p className="text-xs text-gray-400 mb-1">Resumo do Mês</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-white">{appointments.length} agendamentos</span>
+                        <span className="text-green-400 font-semibold">
+                          R$ {appointments.reduce((sum, apt) => sum + apt.service.price, 0).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-700 rounded p-3">
+                      <p className="text-xs text-gray-400 mb-1">Próximos Agendamentos</p>
+                      <p className="text-sm text-blue-400 font-semibold">
+                        {appointments.filter((apt) => apt.status === "scheduled").length} agendamentos marcados
+                      </p>
+                    </div>
+
+                    <div className="bg-gray-700 rounded p-3">
+                      <p className="text-xs text-gray-400 mb-1">Barbeiro Favorito</p>
+                      <p className="text-sm text-white font-semibold">👨‍💼 Jardel</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="bg-gray-700 rounded p-3 text-center">
+                    <p className="text-sm text-gray-400">Faça login para ver suas estatísticas</p>
                   </div>
-                </div>
-
-                <div className="bg-gray-700 rounded p-3">
-                  <p className="text-xs text-gray-400 mb-1">Próximos Agendamentos</p>
-                  <p className="text-sm text-blue-400 font-semibold">
-                    {appointments.filter((apt) => apt.status === "scheduled").length} agendamentos marcados
-                  </p>
-                </div>
-
-                <div className="bg-gray-700 rounded p-3">
-                  <p className="text-xs text-gray-400 mb-1">Barbeiro Favorito</p>
-                  <p className="text-sm text-white font-semibold">👨‍💼 Jardel</p>
-                </div>
+                )}
               </div>
             </div>
           )}
