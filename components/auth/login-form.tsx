@@ -43,7 +43,7 @@ export function LoginForm({ onToggleMode, onContinueAsGuest }: LoginFormProps) {
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-2xl md:text-3xl font-serif text-gray-900 mb-2">Faça seu login</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Faça seu login</h1>
         <p className="text-gray-600">Acesse sua conta para ver seus agendamentos</p>
       </div>
 
@@ -155,11 +155,17 @@ export function LoginForm({ onToggleMode, onContinueAsGuest }: LoginFormProps) {
       {/* Demo Credentials */}
       <div className="mt-8 p-4 bg-gray-50 rounded-lg">
         <p className="text-xs text-gray-500 mb-2">Para demonstração, use:</p>
-        <p className="text-xs text-gray-600">
-          <strong>Email:</strong> joao@email.com
-          <br />
-          <strong>Senha:</strong> 123456
-        </p>
+        <div className="space-y-1 text-xs text-gray-600">
+          <p>
+            <strong>Cliente:</strong> joao@email.com / 123456
+          </p>
+          <p>
+            <strong>Admin Barbearia:</strong> carlos@barbeariacentral.com / 123456
+          </p>
+          <p>
+            <strong>Super Admin:</strong> admin@sistema.com / 123456
+          </p>
+        </div>
       </div>
     </div>
   )

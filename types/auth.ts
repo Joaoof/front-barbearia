@@ -1,3 +1,5 @@
+import type { UserRole } from "./roles"
+
 export interface User {
   id: string
   name: string
@@ -5,6 +7,9 @@ export interface User {
   avatar?: string
   phone?: string
   isGuest?: boolean
+  role: UserRole
+  permissions: string[]
+  barbershopId?: string // Para barbeiros admin
 }
 
 export interface AuthState {

@@ -17,7 +17,7 @@ export function AuthScreen() {
       {/* Mobile Layout */}
       <div className="md:hidden flex flex-col min-h-screen">
         {/* Illustration on top */}
-        <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-black to-black">
+        <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-blue-500 to-purple-600">
           <div className="w-full max-w-sm">
             <BarbershopIllustration />
             <div className="text-center mt-6">
@@ -49,7 +49,7 @@ export function AuthScreen() {
         </div>
 
         {/* Illustration on right */}
-        <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-black to-black">
+        <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-blue-500 to-purple-600">
           <div className="w-full max-w-lg">
             <BarbershopIllustration />
             <div className="text-center mt-8">

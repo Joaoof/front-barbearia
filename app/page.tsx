@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react"
 import { useApp } from "@/contexts/app-context"
 import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 import { Settings } from "lucide-react"
+import { UserRole } from "@/types/roles"
 
 // Components
 import { MobileHeader } from "@/components/mobile/mobile-header"
@@ -18,9 +20,10 @@ import { Button } from "@/components/ui/button"
 export default function BarbershopApp() {
   const [isMobile, setIsMobile] = useState(false)
   const [showNotification, setShowNotification] = useState(false)
+  const router = useRouter()
 
   const { appointments, services } = useApp()
-  const { isGuest } = useAuth()
+  const { isGuest, user } = useAuth()
 
   // Mock schedule data
   const schedule = {
@@ -51,6 +54,20 @@ export default function BarbershopApp() {
 
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
+
+  // Redirect based on user role
+  useEffect(() => {
+    if (user && !isGuest) {
+      if (user.role === UserRole.SUPER_ADMIN) {
+        router.push("/super-admin")
+        return
+      }
+      if (user.role === UserRole.BARBER_ADMIN) {
+        router.push("/admin")
+        return
+      }
+    }
+  }, [user, isGuest, router])
 
   const currentDate = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
