@@ -43,7 +43,7 @@ export function RegisterForm({ onToggleMode, onContinueAsGuest }: RegisterFormPr
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Criar conta</h1>
+        <h1 className="text-2xl md:text-3xl font-serif text-gray-900 mb-2">Criar conta</h1>
         <p className="text-gray-600">Cadastre-se para agendar seus horários</p>
       </div>
 
@@ -143,7 +143,7 @@ export function RegisterForm({ onToggleMode, onContinueAsGuest }: RegisterFormPr
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-serif"
         >
           {loading ? (
             <>
