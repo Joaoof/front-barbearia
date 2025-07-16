@@ -125,7 +125,7 @@ export default function AgendamentosPage() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-12 h-12">
-                          <AvatarImage src="/images/jardel-profile.jpg" alt={appointment.barber.name} />
+                          <AvatarImage src="/images/perfil-padrao.jpg" alt={appointment.barber.name} />
                           <AvatarFallback className="bg-blue-600 text-white font-semibold">
                             {appointment.barber.name.charAt(0).toUpperCase()}
                           </AvatarFallback>
@@ -241,7 +241,7 @@ export default function AgendamentosPage() {
                     {monthAppointments.map((appointment) => (
                       <div key={appointment.id} className="flex items-center gap-3 p-2 bg-gray-700 rounded">
                         <Avatar className="w-8 h-8">
-                          <AvatarImage src="/images/jardel-profile.jpg" alt={appointment.barber.name} />
+                          <AvatarImage src="/images/perfil-padrao.jpg" alt={appointment.barber.name} />
                           <AvatarFallback className="text-xs bg-blue-600 text-white font-semibold">
                             {appointment.barber.name.charAt(0).toUpperCase()}
                           </AvatarFallback>

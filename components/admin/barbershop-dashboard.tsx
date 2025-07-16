@@ -139,8 +139,8 @@ export function BarbershopDashboard() {
               <div className="space-y-4">
                 {todayAppointments.slice(0, 5).map((appointment) => (
                   <div key={appointment.id} className="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src="/images/jardel-profile.jpg" />
+                    <Avatar className="w-20 h-20">
+                      <AvatarImage src="/images/barbeiro1.jpg" />
                       <AvatarFallback className="bg-blue-600 text-white">
                         {appointment.clientName.charAt(0)}
                       </AvatarFallback>

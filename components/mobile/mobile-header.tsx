@@ -26,7 +26,7 @@ export function MobileHeader({ currentDate, showStatusBar = true }: MobileHeader
         <div className="flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <Avatar className="w-12 h-12">
-              <AvatarImage src={user?.avatar || "/images/jardel-profile.jpg"} alt={user?.name} />
+              <AvatarImage src={user?.avatar || "/images/perfil-padrao.jpg"} alt={user?.name} />
               <AvatarFallback className="bg-blue-600 text-white font-semibold">
                 {isGuest ? <User className="w-6 h-6" /> : user?.name?.charAt(0).toUpperCase()}
               </AvatarFallback>

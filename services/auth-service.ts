@@ -21,7 +21,7 @@ class AuthService {
         email: "joao@email.com",
         password: "123456",
         phone: "(11) 99999-9999",
-        avatar: "/images/jardel-profile.jpg",
+        avatar: "/images/perfil-padrao.jpg",
         role: UserRole.CLIENT,
         permissions: ROLES["client"]?.permissions?.map((p) => p.id) || [],
       },

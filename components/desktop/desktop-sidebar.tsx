@@ -31,16 +31,21 @@ export function DesktopSidebar() {
   return (
     <aside className="w-64 bg-gray-800 text-white min-h-screen flex flex-col fixed left-0 top-0 bottom-0">
       {/* Logo/Brand */}
-      <div className="p-6 border-b border-gray-700">
-        <h1 className="text-xl font-bold">BarberShop</h1>
-        <p className="text-gray-400 text-sm">Sistema de Agendamentos</p>
+      <div className="p-6 border-b border-gray-700 flex items-center justify-center h-40">
+        <img
+          src="/images/image-login.png"
+          alt=""
+          width={100}
+          height={100}
+        />
       </div>
+
 
       {/* User Profile */}
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10">
-            <AvatarImage src={user?.avatar || "/images/jardel-profile.jpg"} alt={user?.name} />
+            <AvatarImage src={user?.avatar || "/images/perfil-padrao.jpg"} alt={user?.name} />
             <AvatarFallback className="bg-blue-600 text-white font-semibold">
               {isGuest ? <User className="w-5 h-5" /> : user?.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
@@ -69,11 +74,10 @@ export function DesktopSidebar() {
             <Button
               key={item.label}
               variant={pathname === item.path ? "secondary" : "ghost"}
-              className={`w-full justify-start gap-3 ${
-                pathname === item.path
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
-              }`}
+              className={`w-full justify-start gap-3 ${pathname === item.path
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                }`}
               onClick={() => router.push(item.path)}
             >
               <item.icon className="w-4 h-4" />

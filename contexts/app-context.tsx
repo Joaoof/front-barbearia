@@ -63,7 +63,7 @@ const mockBarbers: Barber[] = [
   {
     id: "1",
     name: "Jardel",
-    avatar: "/images/barber-jardel.jpg",
+    avatar: "/images/barbeiro1.jpg",
     rating: 5.0,
     specialties: ["Corte", "Barba", "Bigode"],
     available: true,
@@ -71,7 +71,7 @@ const mockBarbers: Barber[] = [
   {
     id: "2",
     name: "Carlos",
-    avatar: "/images/jardel-profile.jpg",
+    avatar: "/images/barber-service-5.jpg",
     rating: 4.8,
     specialties: ["Corte", "Barba", "Degradê"],
     available: true,
@@ -79,15 +79,15 @@ const mockBarbers: Barber[] = [
   {
     id: "3",
     name: "Roberto",
-    avatar: "/images/jardel-profile.jpg",
+    avatar: "/images/barbeiro3.jpg",
     rating: 4.9,
     specialties: ["Corte", "Degradê", "Sobrancelha"],
     available: true,
   },
   {
     id: "4",
-    name: "Anderson",
-    avatar: "/images/jardel-profile.jpg",
+    name: "Sara",
+    avatar: "/images/barbeiro4.jpg",
     rating: 4.7,
     specialties: ["Corte", "Barba"],
     available: true,
@@ -101,7 +101,7 @@ const mockServices: Service[] = [
     description: "Corte moderno e estiloso",
     price: 25.0,
     duration: 30,
-    image: "/images/barber-service-1.jpg",
+    image: "/images/barber-service-1.png",
   },
   {
     id: "2",
@@ -109,7 +109,7 @@ const mockServices: Service[] = [
     description: "Aparar e modelar barba",
     price: 15.0,
     duration: 20,
-    image: "/images/barber-service-2.jpg",
+    image: "/images/barber-service-2.png",
   },
   {
     id: "3",
@@ -117,7 +117,7 @@ const mockServices: Service[] = [
     description: "Pacote completo",
     price: 35.0,
     duration: 45,
-    image: "/images/barber-offer.jpg",
+    image: "/images/barber-offer.png",
   },
   {
     id: "4",
@@ -125,6 +125,7 @@ const mockServices: Service[] = [
     description: "Aparar e modelar bigode",
     price: 10.0,
     duration: 15,
+    image: "/images/barber-service-3.png",
   },
   {
     id: "5",
@@ -132,6 +133,7 @@ const mockServices: Service[] = [
     description: "Design de sobrancelha masculina",
     price: 12.0,
     duration: 15,
+    image: "/images/barber-service-4.png",
   },
   {
     id: "6",
@@ -139,6 +141,8 @@ const mockServices: Service[] = [
     description: "Corte degradê profissional",
     price: 30.0,
     duration: 40,
+    image: "/images/barber-service-5.png",
+
   },
 ]
 

@@ -7,7 +7,7 @@ interface ScheduleSectionProps {
 
 export function ScheduleSection({ schedule }: ScheduleSectionProps) {
   return (
-    <div className="px-4 mb-6">
+    <div className="px-4 mb-6 p-5">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-white font-medium">Horários</h2>
         <div className="flex items-center gap-2">

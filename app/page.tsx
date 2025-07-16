@@ -39,7 +39,7 @@ export default function BarbershopApp() {
       title: "Corte + Barba",
       description: "Pacote completo com desconto especial",
       discount: 20,
-      image: "/images/barber-offer.jpg",
+      image: "/images/barber-offer.png",
       validUntil: "2024-12-31",
     },
   ]

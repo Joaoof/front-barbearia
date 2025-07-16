@@ -48,11 +48,11 @@ export function OffersSection({ offers, loading }: OffersSectionProps) {
         <CardContent className="p-0">
           <div className="relative">
             <Image
-              src={mainOffer.image || "/images/barber-offer.jpg"}
+              src={mainOffer.image || "/images/barber-offer.png"}
               alt={mainOffer.title}
-              width={400}
+              width={200}
               height={200}
-              className="w-full h-32 object-cover"
+              className="w-full h-42  object-cover"
             />
             <div className="absolute top-3 left-3">
               <Badge className="bg-green-600 hover:bg-green-600 text-white">{mainOffer.discount}% de desconto</Badge>
