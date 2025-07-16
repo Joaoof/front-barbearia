@@ -71,7 +71,7 @@ const mockBarbers: Barber[] = [
   {
     id: "2",
     name: "Carlos",
-    avatar: "/images/barber-service-5.jpg",
+    avatar: "/images/barbeiro2.jpg",
     rating: 4.8,
     specialties: ["Corte", "Barba", "Degradê"],
     available: true,
